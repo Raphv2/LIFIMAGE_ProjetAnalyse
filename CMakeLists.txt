@@ -5,6 +5,9 @@ project(Projet-Analyse)
 # Find packages
 
 
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
 # Compiler options
 set(CMAKE_CXX_STANDARD 23)
 
@@ -40,6 +43,7 @@ set(INCLUDES
 # Executables
 add_executable(Analyse src/analyse.cpp ${SOURCES})
 target_include_directories(Analyse PUBLIC ${INCLUDES})
+target_link_libraries(Analyse ${OpenCV_LIBS})
 
 add_executable(Synthese src/synthese.cpp ${SOURCES})
 target_include_directories(Synthese PUBLIC ${INCLUDES})
