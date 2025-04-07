@@ -41,9 +41,9 @@ set(INCLUDES
 )
 
 # Executables
-add_executable(Analyse src/analyse.cpp ${SOURCES})
-target_include_directories(Analyse PUBLIC ${INCLUDES})
-target_link_libraries(Analyse ${OpenCV_LIBS})
+#add_executable(Analyse src/analyse.cpp ${SOURCES})
+#target_include_directories(Analyse PUBLIC ${INCLUDES})
+#target_link_libraries(Analyse ${OpenCV_LIBS})
 
 add_executable(Synthese src/synthese.cpp ${SOURCES})
 target_include_directories(Synthese PUBLIC ${INCLUDES})
