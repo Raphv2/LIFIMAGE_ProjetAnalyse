@@ -127,3 +127,14 @@ void operator==(Color& color, float scalar) {
     color.g = scalar;
     color.b= scalar;
 }
+
+Color gamma_correction(const Color& color, float gamma)
+{
+    return Color(
+        std::pow(color.r, 1.f / gamma),
+        std::pow(color.g, 1.f / gamma),
+        std::pow(color.b, 1.f / gamma),
+        color.a
+    );
+}
+

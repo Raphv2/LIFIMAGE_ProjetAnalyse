@@ -48,6 +48,12 @@ set(INCLUDES
 add_executable(Synthese src/synthese.cpp ${SOURCES})
 target_include_directories(Synthese PUBLIC ${INCLUDES})
 
+# OpenMP support
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(Synthese PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
