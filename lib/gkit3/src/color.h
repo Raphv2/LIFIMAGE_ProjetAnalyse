@@ -56,9 +56,5 @@ Color srgb( const Color& color, const float g= float(2.2) );
 //! transformation couleur : srgb vers rgb lineaire
 Color linear( const Color& color, const float g= float(2.2) );
 
-//! transformation couleur : rgb lineaire vers srgb
-Color gamma_correction(const Color& color, float gamma = 2.2f);
-
-
 ///@}
 #endif
