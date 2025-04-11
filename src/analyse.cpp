@@ -36,7 +36,7 @@
 }
  
  int main() {
-     cv::Mat inputImage = cv::imread("data/fleur.jpg");
+     cv::Mat inputImage = cv::imread("data/puzzle.jpg");
      if (inputImage.empty()) {
          std::cerr << "Erreur lors du chargement de l'image." << std::endl;
          return -1;

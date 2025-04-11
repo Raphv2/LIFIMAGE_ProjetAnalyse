@@ -152,8 +152,12 @@ float intersect_sphere(const Point& c, const float r, const Point& o, const Vect
     return t;
 }
 
+<<<<<<< Updated upstream
 
 void test_intersections()
+=======
+int main( )
+>>>>>>> Stashed changes
 {
     std::cout << "- Test intersection plan -" << std::endl;
     Point o = Point(0, 0, 0);
