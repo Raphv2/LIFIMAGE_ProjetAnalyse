@@ -1,57 +1,51 @@
-# Projet
+# LIFIMAGE – Synthèse & Analyse d’image
+
+Projet réalisé dans le cadre du module **LIFIMAGE**. Il se compose de deux volets :
+
+- `synthese.cpp` → un moteur de lancer de rayons (ray tracing)
+- `analyse.cpp` → un outil d’analyse et traitement d’image
+
+## 📁 Structure du projet
+
+```
+/bin/                → exécutables générés
+/data/               → modèles .obj et fichiers image
+/src/                → code source principal
+include/             → en-têtes (gKit)
+lib/                 → gKit3
+```
 
 ## Prérequis
 
-Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur votre système :
+- CMake ≥ 3.22
+- Un compilateur C++ compatible C++20
+- OpenCV (pour les effets post-traitement)
 
-- [CMake](https://cmake.org/download/)
-- [Make](https://www.gnu.org/software/make/)
-- Un compilateur compatible (GCC, Clang, MSVC, etc.)
+## Compilation
 
-## Compilation et exécution
+Un script est fourni pour simplifier la compilation :
 
-Un script `build.sh` est fourni pour faciliter la compilation. Suivez ces étapes pour compiler et exécuter le projet :
-
-### 1. Cloner le dépôt
-```sh
-git clone <url_du_repository>
-cd <nom_du_projet>
-```
-
-### 2. Construire le projet
-
-Exécutez le script `build.sh` pour configurer et compiler le projet :
-```sh
-./build.sh
-```
-
-Si la commande `build.sh` n'est pas reconnue ou génère une erreur d'accès refusé, essayez :
-```sh
+```bash
 chmod +x build.sh
 ./build.sh
 ```
 
-Si la compilation réussit, les exécutables seront générés dans le répertoire `bin`.
+Les exécutables sont générés dans `bin/`.
 
-### 3. Exécuter les programmes
+## Exécution
 
-Une fois la compilation terminée, vous pouvez exécuter les programmes ainsi :
-```sh
-./bin/synthese
-./bin/analyse
+```bash
+./bin/synthese   # lance le moteur de ray tracing
+./bin/analyse    # lance les fonctions d’analyse d’image
 ```
 
-## Nettoyage du projet
+## Nettoyage
 
-Si vous souhaitez nettoyer les fichiers générés lors de la compilation, utilisez la commande :
-```sh
+```bash
 rm -rf build
 ```
-Cela supprimera le répertoire `build` et tout son contenu.
 
-## Dépannage
+## Auteurs
 
-Si la compilation échoue :
-- Vérifiez que CMake et Make sont bien installés.
-- Assurez-vous que votre compilateur est bien configuré et accessible depuis le terminal.
-- Consultez les messages d'erreur pour identifier d'éventuels problèmes dans le code ou la configuration.
+- **Yanis LAASSIBI**
+- **Raphaël GOSSET**
