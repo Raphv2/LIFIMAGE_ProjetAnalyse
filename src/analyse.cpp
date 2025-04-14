@@ -135,7 +135,7 @@ void drawLineHandler(std::vector<std::vector<cv::Point>> contours, cv::Mat& cont
             double ang_contour = Angle(A, B, C);
 
             if (ang_contour > 30.0 ) {
-                std::cout << "Convexe à " << j << " (angle = " << ang_contour << "°)" << std::endl;
+                std::cout << "Concave à " << j << " (angle = " << ang_contour << "°)" << std::endl;
                 cv::line(contourImage, B, B, cv::Scalar(0, 0, 255), 10); 
                 cv::line(contourImage, A, C, cv::Scalar(255, 0, 0), 2);
             } 
