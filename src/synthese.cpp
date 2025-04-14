@@ -4,6 +4,7 @@
  **************************************************************************************************/
 
  #include <iostream>
+ #include <fstream>
  #include <stdexcept>
  #include "vec.h"
  #include <cmath>
@@ -20,7 +21,7 @@
  
  // constantes globales
  const float inf = std::numeric_limits<float>::infinity();
- const float focale = 4.0f;      // distance de mise au point
+ const float focale = 30.0f;      // distance de mise au point
  const float aperture = 0.02f;    // ouverture de la lentille (flou de profondeur)
 
 // structure de base pour stocker une intersection
@@ -247,6 +248,12 @@ struct Scene
         }
 
         Hit h_tri = intersect_bvh(bvh, o, d);
+        /*Hit h_tri;
+        for (const Triangle& t : triangles) {
+            Hit h = t.intersect(o, d);
+            if (h && h.t < h_tri.t) h_tri = h;
+        }*/
+                
         if (h_tri && h_tri.t < best.t) best = h_tri;
                    
 
@@ -270,9 +277,19 @@ int main()
     // Crée la scène
     Scene scene;
     // sphère principale
-    //scene.spheres.push_back(Sphere{ Point(0, 0, -3), 2, Color(1.0f, 0.0f, 0.75f, 1.0f), true }); // magenta néon
+    scene.spheres.push_back(Sphere{
+        Point(0, 1, 0), // 0 0 -3
+        1.0f,
+        Color(1.0f, 0.0f, 0.75f, 1.0f), // magenta néon
+        true
+    });
     // sphère 2
-    //scene.spheres.push_back(Sphere{ Point(-2.5f, -0.75f, -1.0f), 0.5f, Color(0.0f, 1.0f, 1.0f, 1.0f) }); // cyan électrique
+    /*scene.spheres.push_back(Sphere{
+        Point(-2.5f, -0.75f, -1.0f),
+        0.5f,
+        Color(0.0f, 1.0f, 1.0f, 1.0f) // cyan électrique
+        false
+    });*/
 
     scene.sol = Plan{
         Point(0, -1, 0),
@@ -282,52 +299,59 @@ int main()
         Color(1.0f, 1.0f, 1.0f, 1.0f), // blanc
     };  
     
+    /*scene.triangles.push_back(Triangle{
+        Point(-1, 0, -5),
+        Point(1, 0, -5),
+        Point(0, 2, -5),
+        Color(1.0f, 0.0f, 0.0f, 1.0f)  // rouge pétant
+    });*/
+    
     // chargement de l'objet blender 'bea_skeleton_psx'
-    /*
     MeshIOData mesh;
-    if (!read_meshio_data("data/synthese/bea_skeleton_psx.obj", mesh)) {
+    if (!read_meshio_data("data/synthese/bea_skeleton_psx_no_color.obj", mesh)) {
         std::cerr << "Erreur chargement objet" << std::endl;
         return 1;
     }
-    */
 
-    // chargement de l'objet blender 'cube'
-    
-    MeshIOData mesh;
-    if (!read_meshio_data("data/synthese/cube.obj", mesh)) {
-        std::cerr << "Erreur chargement objet" << std::endl;
-        return 1;
-    }
-    
+    // calcul du centre du mesh
+    Point center(0, 0, 0);
+    for (const Point& p : mesh.positions)
+        center = center + p;
+    center = center / float(mesh.positions.size());
 
-    // afficher les coordonnées de la mesh
-    std::cout << "Exemple de coordonnées mesh :\n";
-    for (int i = 0; i < 3; ++i)
-        std::cout << mesh.positions[i] << std::endl;
+    // log
+    std::ofstream log("mesh_debug.log");        
+    
+    float scale = 2.0f; // facteur de mise à l’échelle
+    Vector offset(0, 0, 0);
+    // ajouter les triangles à la scène
+    for (size_t i = 0; i + 2 < mesh.indices.size(); i += 3) {
+
+        // log
+        for (int j = 0; j < 3; ++j) {
+            int idx = mesh.indices[i + j];
+            log << "triangle " << i / 3 << ", vertex " << j << ", index: " << idx
+                      << ", pos: " << mesh.positions[idx] << std::endl;
+        }
+
+        // Vérification des bornes des indices
+        for (int j = 0; j < 3; ++j) {
+            int idx = mesh.indices[i + j];
+            if (idx < 0 || idx >= (int)mesh.positions.size()) {
+                std::cerr << "Indice hors borne : " << idx << std::endl;
+            }
+        }
         
-    // convertir les triangles de 'bea_skeleton_psx' en mesh
-    /*
-    for (size_t i = 0; i + 2 < mesh.indices.size(); i += 3) {
-        Point a = mesh.positions[mesh.indices[i]] + Vector(0, 9.5f, 0);
-        Point b = mesh.positions[mesh.indices[i + 1]] + Vector(0, 9.5f, 0);
-        Point c = mesh.positions[mesh.indices[i + 2]] + Vector(0, 9.5f, 0);
-        int mat_id = mesh.material_indices[i / 3];
-        Color col = mesh.materials(mat_id).diffuse;
-        scene.triangles.push_back(Triangle{a, b, c, col});
-    }
-    */
 
-    // convertir les triangles de 'cube' en mesh
-
-    for (size_t i = 0; i + 2 < mesh.indices.size(); i += 3) {
-        Point a = mesh.positions[mesh.indices[i]] + Vector(0, -2.0f, 0);
-        Point b = mesh.positions[mesh.indices[i + 1]] + Vector(0, -2.0f, 0);
-        Point c = mesh.positions[mesh.indices[i + 2]] + Vector(0, -2.0f, 0);        
-        int mat_id = mesh.material_indices[i / 3];
-        Color col = mesh.materials(mat_id).diffuse;
-        scene.triangles.push_back(Triangle{a, b, c, col});
+        Point a = Point((Vector(mesh.positions[mesh.indices[i]]) - center) * scale + offset);
+        Point b = Point((Vector(mesh.positions[mesh.indices[i + 1]]) - center) * scale + offset);
+        Point c = Point((Vector(mesh.positions[mesh.indices[i + 2]]) - center) * scale + offset);        
+        /*int mat_id = mesh.material_indices[i / 3];
+        Color col = mesh.materials(mat_id).diffuse;*/
+        Color col = Color(0.5f, 0.5f, 0.5f, 1.0f); // gris neutre
+        scene.triangles.push_back(Triangle{a, c, b, col});
     }
-    
+        
 
     // construire le BVH
     std::vector<const Triangle*> triangle_ptrs;
@@ -382,7 +406,7 @@ int main()
                 float radius = aperture * sqrt(distrib(rng));
                 float ox = radius * std::cos(angle);
                 float oy = radius * std::sin(angle);
-                Point o = Point(ox, oy, 20.0f); // position de la lentille
+                Point o = Point(ox, oy, 4.5f); // position de la lentille
                 // point sur le plan focal
                 Point f = Point(px + dx - image.width() / 2, py + dy - image.height() / 2, -focale);
                 Vector d = normalize(Vector(o, f));
