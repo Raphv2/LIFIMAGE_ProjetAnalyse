@@ -28,7 +28,7 @@
  const float inf =
      std::numeric_limits<float>::infinity();  // valeur infinie pour les calculs
  const float focale =
-     10.0f;  // distance focale de la caméra (plus grand = plan plus éloigné)
+     50.0f;  // distance focale de la caméra (plus grand = plan plus éloigné)
  const float aperture = 0.02f;  // taille de l'ouverture pour le flou (plus grand
                                 // = flou plus étendu)
  
@@ -249,10 +249,10 @@
        for (const Sphere &s : spheres) {  // teste les sphères
           if (Hit h = s.intersect(o, d); h && h.t < best.t) best = h;
        }
-       
+ 
        if (Hit h = intersect_bvh(bvh, o, d); h && h.t < best.t)
           best = h;  // teste le BVH
-          
+ 
        if (Hit h = sol.intersect(o, d); h && h.t < best.t)
           best = h;  // teste le sol
        return best;
@@ -341,7 +341,7 @@
                                       py);  // générateur aléatoire par ligne
        std::uniform_real_distribution<float> distrib(0.f, 1.f);
  
-       int samples = 4096;  // nombre d'échantillons par pixel
+       int samples = 2048;  // nombre d'échantillons par pixel
        for (int px = 0; px < image.width(); px++) {
           Color final_color = Black();
           for (int s = 0; s < samples; s++) {
@@ -382,12 +382,11 @@
  
     // Sphères déplacées : l'une à gauche, l'autre à droite du mesh
     scene.spheres.push_back(
-        Sphere{Point(-3.5f, -1.0f + 1.0f, 1.5f),  // rayon 1.0f, sol à y=-1
+        Sphere{Point(-2.5f, 0.5f, -3.0f),  // rayon 1.0f, sol à y=-1
                1.0f, Color(1.0f, 0.0f, 0.75f, 1.0f), true});
-    scene.spheres.push_back(Sphere{Point(3.5f, -1.0f + 0.7f, 1.0f), 0.7f,
+    scene.spheres.push_back(Sphere{Point(0.0f, 0.3f, -2.8f), 0.3f,
                                    Color(0.0f, 1.0f, 1.0f, 1.0f), false});
  
-    
     // Mesh OBJ (Blender)
     std::vector<Point> meshPoints;
     if (!read_positions("data/synthese/monkey_head.obj", meshPoints)) {
@@ -404,33 +403,34 @@
     }
     Vector center = Vector((pmin + pmax) * 0.5f);  // centre de la boîte du mesh
  
- 
     // Calculer la diagonale pour normaliser
     // float scale = (2.0f / length(pmax - pmin)) * 2.0f;
     float scale = 1.0f / length(pmax - pmin);  // réduction plus douce
-    float rotation_angle = radians(-90.0f);
-    Vector offset(0.0f, 0.0f, 1.2f); // vers le centre visuel
+    float rotation_angle = radians(180.0f);
+    Vector offset(0, 0, 1.5f);  // vers le centre visuel
  
     for (size_t i = 0; i + 2 < meshPoints.size(); i += 3) {
-      Point a = Point(rotateX(Vector(meshPoints[i]     - center) * scale,
-  rotation_angle)) + offset; Point b = Point(rotateX(Vector(meshPoints[i + 1] -
-  center) * scale, rotation_angle)) + offset; Point c =
-  Point(rotateX(Vector(meshPoints[i + 2] - center) * scale, rotation_angle)) +
-  offset;
+
+      Point a = Point(rotateX(Vector(meshPoints[i] - center) * scale,
+                              rotation_angle)) +
+               offset;
+      Point b = Point(rotateX(Vector(meshPoints[i + 1] - center) * scale,
+                              rotation_angle)) +
+               offset;
+      Point c = Point(rotateX(Vector(meshPoints[i + 2] - center) * scale,
+                              rotation_angle)) +
+               offset;
+
+       Vector n = normalize(cross(Vector(a, b), Vector(a, c)));
+       if (dot(n, Vector(0, 1, 0)) < 0) std::swap(b, c);
  
- 
-      Vector n = normalize(cross(Vector(a, b), Vector(a, c)));
-      if (dot(n, Vector(0, 1, 0)) < 0) std::swap(b, c);
- 
-      scene.triangles.push_back(Triangle{a, b, c, Color(0.2f, 0.6f, 0.4f)});
-  }
- 
+       scene.triangles.push_back(Triangle{a, b, c, Color(0.2f, 0.6f, 0.4f)});
+    }
  
     // BVH
     std::vector<const Triangle *> ptrs;
     for (const Triangle &t : scene.triangles) ptrs.push_back(&t);
     scene.bvh = build_bvh(ptrs);
-    
  }
  
  // Fonction pour convertir une image gKit en Mat OpenCV
@@ -479,6 +479,9 @@
         normalize(Vector(4, 6, -1))};  // sources lumineuses
     Color emission = Color(1.2f);      // intensité lumineuse
     Image image(512, 512);             // image de sortie
+ 
+    render_scene(scene, image, lights, emission);
+    write_image(image, "image.png");
  
     cv::Mat mat = image_to_mat(image);
     apply_gaussian_blur(mat, "image_gaussian_blur.png");

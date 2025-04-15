@@ -32,6 +32,25 @@ chmod +x build.sh
 
 Les exécutables sont générés dans `bin/`.
 
+### En cas de conflit CMake
+
+Si vous avez cette erreur :
+```
+CMake Error: The source "..." does not match the source "..."
+```
+
+Cela signifie que vous avez lancé cmake dans un dossier build/ déjà utilisé par un autre projet.
+
+Dans ce cas, supprimez le dossier build/ et recommencez :
+
+```
+rm -rf build/
+mkdir build
+cd build
+cmake ..
+make
+```
+
 ## Exécution
 
 ```bash

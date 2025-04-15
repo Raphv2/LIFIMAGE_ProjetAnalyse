@@ -1,6 +1,6 @@
 # Global Project Configuration
 cmake_minimum_required(VERSION 3.22)
-project(Projet-Analyse)
+project(lifimage_projet)
 
 # Find packages
 
